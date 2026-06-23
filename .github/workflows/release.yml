@@ -1,0 +1,60 @@
+name: iPatata Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Grant Execute Permission to Gradle
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Rename APK
+        run: mv app/build/outputs/apk/release/app-release.apk iPatata-1.0.0.apk || mv app/build/outputs/apk/release/app-release-unsigned.apk iPatata-1.0.0.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: iPatata-1.0.0.apk
+          name: "iPatata 1.0.0"
+          body: |
+            # 🥔 iPatata v1.0.0 - La Primera Cosecha
+            
+            ¡Bienvenido a la primera versión oficial de **iPatata**! 
+            
+            ### ✨ Novedades
+            - 🎶 **Reproductor musical** completo con interfaz clásica de rueda.
+            - 🕹️ Minijuego de **Snake** integrado con botones y pad retro.
+            - 🌈 **Ecualizador visual animado** en la rejilla del altavoz que reacciona a tu música.
+            - 🔋 Estado de batería dibujado en la barra superior con estilo retro.
+            - 🎨 Varios **Temas** visuales para personalizar la interfaz (Tema Poke, Hopps, Contratop...).
+            - 🎧 Soporte de **Crossfade** y controles intuitivos.
+            
+            *Desarrollado con ❤️ por ContratopDev*
+            
+            👇 **Descarga el APK más abajo, instálalo en tu Android y a disfrutar.** 👇
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
