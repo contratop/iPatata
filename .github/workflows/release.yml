@@ -1,10 +1,11 @@
 name: iPatata Release
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,21 +28,29 @@ jobs:
       - name: Grant Execute Permission to Gradle
         run: chmod +x gradlew
 
+      - name: Extract Version Name
+        id: version
+        run: |
+          VERSION_NAME=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "Extracted version: $VERSION_NAME"
+
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
       - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release.apk iPatata-1.0.0.apk || mv app/build/outputs/apk/release/app-release-unsigned.apk iPatata-1.0.0.apk
+        run: mv app/build/outputs/apk/release/app-release.apk iPatata-${{ env.VERSION_NAME }}.apk || mv app/build/outputs/apk/release/app-release-unsigned.apk iPatata-${{ env.VERSION_NAME }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: iPatata-1.0.0.apk
-          name: "iPatata 1.0.0"
+          files: iPatata-${{ env.VERSION_NAME }}.apk
+          name: "iPatata ${{ env.VERSION_NAME }}"
+          tag_name: "v${{ env.VERSION_NAME }}"
           body: |
-            # 🥔 iPatata v1.0.0 - La Primera Cosecha
+            # 🥔 iPatata v${{ env.VERSION_NAME }} - Lanzamiento Automático
             
-            ¡Bienvenido a la primera versión oficial de **iPatata**! 
+            ¡Nueva versión compilada automáticamente tras el último código subido (commit)!
             
             ### ✨ Novedades
             - 🎶 **Reproductor musical** completo con interfaz clásica de rueda.
