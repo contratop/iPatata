@@ -4,6 +4,10 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -374,8 +378,17 @@ fun IPodScreenDisplay(viewModel: IPodViewModel, modifier: Modifier = Modifier) {
 
 @Composable
 fun MenuList(items: List<String>, selectedIndex: Int) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        items.forEachIndexed { index, item ->
+    val listState = rememberLazyListState()
+    
+    LaunchedEffect(selectedIndex) {
+        if (items.isNotEmpty()) {
+            val scrollIndex = (selectedIndex - 2).coerceAtLeast(0)
+            listState.animateScrollToItem(scrollIndex)
+        }
+    }
+
+    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        itemsIndexed(items) { index, item ->
             val isSelected = index == selectedIndex
             Box(
                 modifier = Modifier
@@ -387,7 +400,9 @@ fun MenuList(items: List<String>, selectedIndex: Int) {
                     text = item,
                     color = if (isSelected) ScreenHighlightText else ScreenText,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,11 +27,28 @@ fun GameboyControls(
     modifier: Modifier = Modifier
 ) {
     val dpadColor = theme.wheelColor
-    // Lighter variant of primary color by mixing with white (alpha overlay equivalent)
-    val buttonColor = theme.color.copy(alpha = 0.6f)
-    val textColor = theme.wheelColor
+    val buttonColor = theme.centerButtonColor
+    val textColor = theme.controlTextColor
 
-    Box(modifier = modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val rawScaleX = maxWidth.value / 360f
+        val rawScaleY = maxHeight.value / 280f
+        val scale = minOf(1f, minOf(rawScaleX, rawScaleY))
+
+        val dpadBoxSize = (156 * scale).dp
+        val dpadW = (52 * scale).dp
+        val dpadH = (156 * scale).dp
+        val btnSize = (60 * scale).dp
+        val btnBorder = (3 * scale).dp
+        val actionSpace = (36 * scale).dp
+        val padB = (50 * scale).dp
+        val padA = (10 * scale).dp
+        val btnText = (24 * scale).sp
+        val lblText = (12 * scale).sp
+        val selW = (48 * scale).dp
+        val selH = (14 * scale).dp
+        val selText = (10 * scale).sp
+        
         // MAIN CONTROLS GROUP (Centered)
         Column(
             modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
@@ -41,14 +59,14 @@ fun GameboyControls(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Top
             ) {
                 // D-PAD
                 Box(
                     modifier = Modifier
                         .padding(top = 4.dp)
-                        .size(156.dp)
+                        .size(dpadBoxSize)
                         .pointerInput(Unit) {
                             awaitPointerEventScope {
                                 while (true) {
@@ -77,16 +95,16 @@ fun GameboyControls(
                     // Vertical bar
                     Box(
                         modifier = Modifier
-                            .width(52.dp)
-                            .height(156.dp)
+                            .width(dpadW)
+                            .height(dpadH)
                             .clip(RoundedCornerShape(6.dp))
                             .background(dpadColor)
                     )
                     // Horizontal bar
                     Box(
                         modifier = Modifier
-                            .width(156.dp)
-                            .height(52.dp)
+                            .width(dpadH)
+                            .height(dpadW)
                             .clip(RoundedCornerShape(6.dp))
                             .background(dpadColor)
                     )
@@ -99,46 +117,46 @@ fun GameboyControls(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(36.dp),
+                        horizontalArrangement = Arrangement.spacedBy(actionSpace),
                         verticalAlignment = Alignment.Top
                     ) {
                         // Button B (Reserved) - LOWER
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(top = 50.dp)
+                            modifier = Modifier.padding(top = padB)
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(60.dp)
+                                    .size(btnSize)
                                     .clip(CircleShape)
                                     .background(buttonColor)
-                                    .border(3.dp, dpadColor, CircleShape),
+                                    .border(btnBorder, dpadColor, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("B", color = textColor, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                                Text("B", color = textColor, fontWeight = FontWeight.Bold, fontSize = btnText)
                             }
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text(" ", color = dpadColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(" ", color = dpadColor, fontSize = lblText, fontWeight = FontWeight.Bold)
                         }
                         
                         // Button A - HIGHER
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(top = 10.dp)
+                            modifier = Modifier.padding(top = padA)
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(60.dp)
+                                    .size(btnSize)
                                     .clip(CircleShape)
                                     .background(buttonColor)
-                                    .border(3.dp, dpadColor, CircleShape)
+                                    .border(btnBorder, dpadColor, CircleShape)
                                     .clickable { viewModel.selectCurrentItem() },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("A", color = textColor, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                                Text("A", color = textColor, fontWeight = FontWeight.Bold, fontSize = btnText)
                             }
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text("ACCION", color = dpadColor, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("ACCION", color = dpadColor, fontSize = lblText, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -154,26 +172,26 @@ fun GameboyControls(
                     Box(
                         modifier = Modifier
                             .rotate(-20f)
-                            .size(width = 48.dp, height = 14.dp)
+                            .size(width = selW, height = selH)
                             .clip(RoundedCornerShape(7.dp))
                             .background(dpadColor.copy(alpha = 0.8f))
                             .clickable { viewModel.navigateBack() }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("SELECT", color = dpadColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("SELECT", color = dpadColor, fontSize = selText, fontWeight = FontWeight.Bold)
                 }
                 // Start
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
                         modifier = Modifier
                             .rotate(-20f)
-                            .size(width = 48.dp, height = 14.dp)
+                            .size(width = selW, height = selH)
                             .clip(RoundedCornerShape(7.dp))
                             .background(dpadColor.copy(alpha = 0.8f))
                             .clickable { viewModel.startSnakeGame() }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("START", color = dpadColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("START", color = dpadColor, fontSize = selText, fontWeight = FontWeight.Bold)
                 }
             }
         }

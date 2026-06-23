@@ -50,25 +50,29 @@ fun IPodApp(viewModel: IPodViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Screen container to hold original layout space
-            Box(
+            Column(
                 modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(0.45f),
-                contentAlignment = Alignment.TopCenter
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 IPodScreenDisplay(
                     viewModel = viewModel,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.80f) // Take exactly 80% of the container's height (makes it shorter)
+                        .weight(1f) // Takes whatever space remains, keeping ratio dynamic
                 )
+                
+                Spacer(modifier = Modifier.height(12.dp))
                 
                 if (viewModel.currentScreen == ScreenState.SNAKE) {
                     MiniPlayerBubble(
                         viewModel = viewModel, 
-                        theme = theme,
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 2.dp)
+                        theme = theme
                     )
+                } else {
+                    // Empty space to keep the screen size consistent even without the bubble
+                    Spacer(modifier = Modifier.height(60.dp))
                 }
             }
 
