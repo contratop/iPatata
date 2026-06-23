@@ -1,0 +1,69 @@
+name: iPatata Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: gradle
+
+      - name: Grant Execute Permission to Gradle
+        run: chmod +x gradlew
+
+      - name: Extract Version Name
+        id: version
+        run: |
+          VERSION_NAME=$(grep -oP 'versionName\s*=\s*"\K[^"]+' app/build.gradle.kts)
+          echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+          echo "Extracted version: $VERSION_NAME"
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Rename APK
+        run: mv app/build/outputs/apk/release/app-release.apk iPatata-${{ env.VERSION_NAME }}.apk || mv app/build/outputs/apk/release/app-release-unsigned.apk iPatata-${{ env.VERSION_NAME }}.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: iPatata-${{ env.VERSION_NAME }}.apk
+          name: "iPatata ${{ env.VERSION_NAME }}"
+          tag_name: "v${{ env.VERSION_NAME }}"
+          body: |
+            # 🥔 iPatata v${{ env.VERSION_NAME }} - Lanzamiento Automático
+            
+            ¡Nueva versión compilada automáticamente tras el último código subido (commit)!
+            
+            ### ✨ Novedades
+            - 🎶 **Reproductor musical** completo con interfaz clásica de rueda.
+            - 🕹️ Minijuego de **Snake** integrado con botones y pad retro.
+            - 🌈 **Ecualizador visual animado** en la rejilla del altavoz que reacciona a tu música.
+            - 🔋 Estado de batería dibujado en la barra superior con estilo retro.
+            - 🎨 Varios **Temas** visuales para personalizar la interfaz (Tema Poke, Hopps, Contratop...).
+            - 🎧 Soporte de **Crossfade** y controles intuitivos.
+            
+            *Desarrollado con ❤️ por ContratopDev*
+            
+            👇 **Descarga el APK más abajo, instálalo en tu Android y a disfrutar.** 👇
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
