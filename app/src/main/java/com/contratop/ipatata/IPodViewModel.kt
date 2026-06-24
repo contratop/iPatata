@@ -96,7 +96,12 @@ class IPodViewModel(application: android.app.Application) : androidx.lifecycle.A
     }
 
     // Main Menu items
-    val mainMenuItems = listOf("Música", "Escuchando ahora", "Juegos", "Ajustes")
+    val mainMenuItems: List<String>
+        get() = if (currentSong != null) {
+            listOf("Música", "Escuchando ahora", "Juegos", "Ajustes")
+        } else {
+            listOf("Música", "Juegos", "Ajustes")
+        }
     var mainMenuSelection by mutableStateOf(0)
         private set
         
@@ -335,18 +340,19 @@ class IPodViewModel(application: android.app.Application) : androidx.lifecycle.A
     fun selectCurrentItem() {
         when (currentScreen) {
             ScreenState.MAIN_MENU -> {
-                when (mainMenuSelection) {
-                    0 -> {
+                val safeSelection = mainMenuSelection.coerceIn(0, mainMenuItems.size - 1)
+                when (mainMenuItems[safeSelection]) {
+                    "Música" -> {
                         scanMusic()
                         currentScreen = if (musicList.isEmpty()) ScreenState.NO_MUSIC else ScreenState.MUSIC_LIST
                     }
-                    1 -> {
+                    "Escuchando ahora" -> {
                         if (currentSong != null) {
                             currentScreen = ScreenState.NOW_PLAYING
                         }
                     }
-                    2 -> currentScreen = ScreenState.GAMES
-                    3 -> currentScreen = ScreenState.SETTINGS
+                    "Juegos" -> currentScreen = ScreenState.GAMES
+                    "Ajustes" -> currentScreen = ScreenState.SETTINGS
                 }
             }
             ScreenState.SETTINGS -> {

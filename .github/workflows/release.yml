@@ -52,13 +52,12 @@ jobs:
             
             ¡Nueva versión compilada automáticamente tras el último código subido (commit)!
             
-            ### ✨ Novedades
-            - 🎶 **Reproductor musical** completo con interfaz clásica de rueda.
-            - 🕹️ Minijuego de **Snake** integrado con botones y pad retro.
-            - 🌈 **Ecualizador visual animado** en la rejilla del altavoz que reacciona a tu música.
-            - 🔋 Estado de batería dibujado en la barra superior con estilo retro.
-            - 🎨 Varios **Temas** visuales para personalizar la interfaz (Tema Poke, Hopps, Contratop...).
-            - 🎧 Soporte de **Crossfade** y controles intuitivos.
+            ### ✨ Novedades en v1.1.0
+            - 🌟 **Nuevo Icono** de la aplicación.
+            - 📱 **Diseño Adaptativo** para cualquier tamaño de pantalla.
+            - 🎛️ **Botonera Gameboy con alto contraste** automático en todos los temas.
+            - ⚙️ **Rueda Táctil perfeccionada** con menor sensibilidad.
+            - 🧠 **Menú Inteligente** que oculta opciones vacías.
             
             *Desarrollado con ❤️ por ContratopDev*
             

@@ -42,7 +42,7 @@ fun ClickWheel(
     val haptic = LocalHapticFeedback.current
     
     // Sensitivity threshold for scrolling (in degrees)
-    val angleThreshold = 15.0
+    val angleThreshold = 25.0
 
     Box(
         modifier = modifier
